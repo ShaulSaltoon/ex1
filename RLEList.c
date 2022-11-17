@@ -29,10 +29,21 @@ RLEListResult RLEListAppend(RLEList list, char value){
     if(list==NULL||value==NULL){
         return RLE_LIST_NULL_ARGUMENT;
     }
-    RLEList ptr = malloc(sizeof(*ptr));
-    if(!ptr){
-        return RLE_LIST_OUT_OF_MEMORY;
+    if(list->symbol==value){
+        list->len++;
+    }else{
+         RLEList ptr = malloc(sizeof(*ptr));
+        if(!ptr){
+            return RLE_LIST_OUT_OF_MEMORY;
+        }
+        ptr->symbol = value;
+        ptr->len=1;
+        list->next=ptr;
     }
+    return RLE_LIST_SUCCESS;
+}
+
+   
     
 }
 
