@@ -95,15 +95,7 @@ char* RLEListExportToString(RLEList list, RLEListResult* result)
         return NULL;
     }
 
-    for (int i = 0; i < numOfNodes; i++)
-    {
-        RLEListStr[i*3 + character] = list->currentChar;
-        RLEListStr[i*3 + instances] = list->repetitions;
-        RLEListStr[i*3 + nextLineIndicator] = '\n';
-        list = list->next;
-    }
-
-    /*RLEListStr[0] = '\0';
+    RLEListStr[0] = '\0';
     char* ptrCurrentNodeStr = RLEListStr;
     
     for (int i = 0; i < numOfNodes; i++) 
@@ -112,7 +104,7 @@ char* RLEListExportToString(RLEList list, RLEListResult* result)
         numOfChars = sprintf(ptrCurrentNodeStr, "%c%d\n", list->currentChar, list->repetitions);
         ptrCurrentNodeStr += numOfChars;
         list = list->next;
-    } */
+    }
 
     *result = RLE_LIST_SUCCESS;// might cause a memory leak
     return RLEListStr;
