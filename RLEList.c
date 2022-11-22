@@ -193,7 +193,7 @@ char* RLEListExportToString(RLEList list, RLEListResult* result)
 
     if (!RLEListStr) 
     {
-        *result = RLE_LIST_OUT_OF_MEMORY;// might cause a memory leak
+        //*result = RLE_LIST_OUT_OF_MEMORY;// might cause a memory leak
         return NULL;
     }
 
@@ -208,7 +208,7 @@ char* RLEListExportToString(RLEList list, RLEListResult* result)
         list = list->next;
     }
 
-    *result = RLE_LIST_SUCCESS;// might cause a memory leak
+    //*result = RLE_LIST_SUCCESS;// might cause a memory leak
     return RLEListStr;
 }
 
