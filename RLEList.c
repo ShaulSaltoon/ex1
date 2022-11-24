@@ -1,6 +1,6 @@
 /*************************Included Files*********************************/
 
-
+#include <assert.h>
 #include "RLEList.h"
 #include <stdio.h>
 #include <stdbool.h>
@@ -44,14 +44,19 @@ RLEList RLEListCreate()
         return NULL;
     }
 
-    node->repetitions = 1;
+    node->repetitions = 0;
     node->currentChar = '\0';
     node->next = NULL;
     return node;
 }
 
+//works:
 void RLEListDestroy (RLEList list)
 {
+    if( list == NULL)
+    {
+        return;
+    }
     while(list){
         RLEList delete = list;
         list = list ->next;
@@ -59,7 +64,7 @@ void RLEListDestroy (RLEList list)
     }
 }
 
-
+//works:
 RLEListResult RLEListAppend(RLEList list, char value)
 {
     if(list==NULL||value=='\0')
@@ -82,6 +87,7 @@ RLEListResult RLEListAppend(RLEList list, char value)
         if (list->currentChar == '\0')
         {
             list->currentChar = value;
+            list->repetitions ++;
             return RLE_LIST_SUCCESS;
         }
         else {
@@ -119,7 +125,7 @@ RLEListResult RLEListAppend(RLEList list, char value)
     return RLE_LIST_SUCCESS;*/
 }
 
-
+//works
 int RLEListSize(RLEList list) {
     if (list == NULL) {
         return SIZE_FAIL;
@@ -127,32 +133,39 @@ int RLEListSize(RLEList list) {
 
     int size = 0;
     while (list != NULL) {
-        if (list->currentChar == '\0' && list->repetitions == 1 && list->next == NULL) {
+        size += list->repetitions;
+        if ( list->next == NULL) {
             break;
         }
         
-        size += list->repetitions;
+        
         list = list->next;
 
     }
     return size;
 }
 
-
 char RLEListGet(RLEList list, int index, RLEListResult *result)
 {
     if (list == NULL) 
     {
-        //*result = RLE_LIST_NULL_ARGUMENT;// might cause a memory leak
+        if (result != NULL)
+        {
+        *result = RLE_LIST_NULL_ARGUMENT;
+        }
         return RESULT_FAIL;
     }
 
-    if (index > RLEListSize(list) || index <= 0)//might need to be <0 if the index starts from 0
+    if (index > RLEListSize(list) -1 || index < 0)//listsize -1 cause the index is like in an array
     {
-        //*result = RLE_LIST_INDEX_OUT_OF_BOUNDS;// might cause a memory leak
+        if (result != NULL)
+        {
+            *result = RLE_LIST_INDEX_OUT_OF_BOUNDS;
+        }
         return RESULT_FAIL;
     }
 
+    index++; // treating it like a real number and not a index for an array
     RLEList tmpList = list;
     int sum = RESULT_FAIL;
 
@@ -162,101 +175,176 @@ char RLEListGet(RLEList list, int index, RLEListResult *result)
         tmpList = list;
         list = list->next;
     } 
-    //*result = RLE_LIST_SUCCESS;// might cause a memory leak
+    if (result != NULL)
+    {
+        *result = RLE_LIST_SUCCESS;
+    }
     return tmpList->currentChar;
 }
 
-
+//work !!! 
 RLEListResult RLEListMap(RLEList list, MapFunction map_function)
 {
     if (list == NULL || map_function == NULL) return  RLE_LIST_NULL_ARGUMENT;
-    
+    RLEList tempNode = list;
     do {
-        list->currentChar = map_function(list->currentChar);
+        tempNode->currentChar = map_function(tempNode->currentChar);
+        tempNode = tempNode->next;
+        
+    } while (tempNode);
+    //check for doubles:
+
+    while(list->next!=NULL){
+        tempNode=list->next;
+        assert(tempNode==list->next);
+        if(list->currentChar == tempNode->currentChar){
+            list->repetitions += tempNode->repetitions;
+            if(!tempNode->next){
+                tempNode->repetitions = 0;
+                tempNode->currentChar = '\0';
+                tempNode->next = NULL;
+                break;
+            }
+            //
+            list->next=tempNode->next;
+            free(tempNode);
+
+            
+        }else{
         list = list->next;
-    } while (list);
+        }
+    }
+
     return RLE_LIST_SUCCESS;
 }
 
-
+//work
 char* RLEListExportToString(RLEList list, RLEListResult* result) 
 {
+
     if (list == NULL) 
     {
-        *result = RLE_LIST_NULL_ARGUMENT;// might cause a memory leak
+        if(result != NULL)
+        {
+            *result = RLE_LIST_NULL_ARGUMENT;  
+        }
         return NULL;
     }
 
     //int listSize = RLEListSize(list);
     int numOfNodes = findNumOfNodes(list);
-    char* RLEListStr = (char*)malloc(sizeof(char) * (numOfNodes * 3 + 1));
-
+    //changing the size of malloc to check:
+    char* RLEListStr = (char*)malloc((sizeof(char)*2 + sizeof(int)+1 )* (numOfNodes + 1));
+    //cheking if there is a malloc problem:
     if (!RLEListStr) 
-    {
-        //*result = RLE_LIST_OUT_OF_MEMORY;// might cause a memory leak
+    {   //check it the user wants to save the result:
+        if(result != NULL)
+        {
+            *result = RLE_LIST_OUT_OF_MEMORY;
+        }
         return NULL;
     }
-
-    RLEListStr[0] = '\0';
-    char* ptrCurrentNodeStr = RLEListStr;
+    //dont know why you putting this sign in the beggining?
+    //RLEListStr[0] = '\0';
+    char* tempNode = RLEListStr;
     
     for (int i = 0; i < numOfNodes; i++) 
     {
-        int numOfChars = 0;
-        numOfChars = sprintf(ptrCurrentNodeStr, "%c%d\n", list->currentChar, list->repetitions);
-        ptrCurrentNodeStr += numOfChars;
+        int spintfNum = 0;
+        //sprintf(buffer, "Sum of %d and %d is %d", a, b, c);
+        spintfNum= sprintf(tempNode, "%c%d\n", list->currentChar, list->repetitions);
+        assert((spintfNum!=-1));
+        //printf("%s",tempNode);
+        tempNode += spintfNum;
         list = list->next;
     }
 
-    //*result = RLE_LIST_SUCCESS;// might cause a memory leak
+    if(result != NULL)
+    {
+        *result = RLE_LIST_SUCCESS;
+    }
     return RLEListStr;
 }
 
-
+//work:
 RLEListResult RLEListRemove(RLEList list, int index)
 {
-    if (list == NULL) return RLE_LIST_NULL_ARGUMENT;
-    if (index > RLEListSize(list) || index <= 0) return RLE_LIST_INDEX_OUT_OF_BOUNDS;
-    
-    struct RLEList_t* lastNode = NULL;
-    int num = 0;
-
-    while (num < index)
+    if (list == NULL) 
     {
-        lastNode = list;
-        num += list->repetitions;
-        list = list->next;
+        return RLE_LIST_NULL_ARGUMENT;
     }
-
-    list->repetitions--;
-    
-    if (list->repetitions <= 0)
+    if (index > RLEListSize(list)-1|| index < 0)//listsize -1 cause the index is like in an array
     {
-        if (index < 0)
-        {
-            struct RLEList_t* nodeToDelete = list;
-            list = list->next;
-            free(nodeToDelete);//is it actually deleting the first node or is it just deleting NodeToDelete?
-        }
-
-        else 
-        {
-            struct RLEList_t* nextNode = list->next;
-            lastNode->next = nextNode;
-            struct RLEList_t* nodeToDelete = list;
-            if(lastNode->currentChar != nextNode->currentChar)
-            {
-                free(nodeToDelete);//is it actually deleting the first node or is it just deleting NodeToDelete?
-            }
-            else
-            {
-                lastNode->repetitions +=nextNode->repetitions;
-                lastNode->next = nextNode->next;
-                free(nodeToDelete);//repetitive
-                free(nextNode);
-            }
-        }
+        return RLE_LIST_INDEX_OUT_OF_BOUNDS;
     }
+    int tempLoop= index+1;
+    RLEList tempNode=list;
+    RLEList tempLast = NULL;
+    //select the correct node:
+    while(tempLoop-tempNode->repetitions>0) {
+        tempLoop -= tempNode->repetitions;
+        //for later use:
+        tempLast = tempNode;
+        tempNode = tempNode->next;
+        assert((tempLast->next==tempNode));
 
+    }
+    // no need of deleting node : 
+    if(tempNode->repetitions > 1){
+        tempNode->repetitions--;
+        return RLE_LIST_SUCCESS;
+    }
+    //we need to delete node:
+
+    //check if tempNode is the first one:
+    if(!list->next){
+        tempNode->repetitions = 0;
+        tempNode->currentChar = '\0';
+        tempNode->next = NULL;
+       // free(tempNode);
+        return RLE_LIST_SUCCESS;
+    }
+    if(tempNode == list)
+    {
+        tempNode = list->next;
+
+        list->next = tempNode->next;
+        *list = *tempNode;
+     //   printf("list char: %c list rep %d\n",list->currentChar,list->repetitions);
+        free(tempNode);
+        return RLE_LIST_SUCCESS;
+    }
+    //temp node is in the middle or end: 
+    if(tempNode->next==NULL){
+        //temp node is in the end:
+        
+        tempLast->next=NULL;
+        
+    }else{
+        //temp node is in the middle:
+        //check if tempLast to the next in chain
+        if(tempLast->currentChar!=tempNode->next->currentChar){
+            tempLast->next= tempNode->next;
+        }else{
+            //we need to merge between nodes:
+            tempLast->repetitions += tempNode->next->repetitions;
+            tempLast->next= tempNode->next->next;
+            free(tempNode->next);
+        }
+        
+        
+    }
+    free(tempNode);
     return RLE_LIST_SUCCESS;
 }
+
+
+
+
+
+
+
+
+
+
+

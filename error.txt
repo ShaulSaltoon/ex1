@@ -1,0 +1,118 @@
+1 Running basicTest ... we got here!
+problem[OK]
+2 Running basicTestMacros ... [OK]
+3 Running RLEListCreateTest ... [OK]
+4 Running RLEListDestroyTest ... [OK]
+5 Running RLEListAppendTest ... [OK]
+6 Running RLEListSizeTest ... we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+problemwe got here!
+problemwe got here!
+problemwe got here!
+problem[OK]
+7 Running RLEListRemoveTest ... current i is : 49we got here!
+first in helper is : 1
+current i is : 48we got here!
+first in helper is : 1
+current i is : 47we got here!
+first in helper is : 4
+
+Assertion failed at RLEUnitTests//RLEListUnitTest.c:464 __currentChar == *(__string++) 
+String cmp failed on index=0 in list, got=1 and expected=4[Failed]
+8 Running RLEListGetTest ... [OK]
+9 Running RLEListExportToStringTest ... we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+we got here!
+
+Assertion failed at RLEUnitTests//RLEListUnitTest.c:619 *(expectedResult++) == *(comparer++) [Failed]
+10 Running RLEListMapTest ... [OK]
+11 Running RLEListMapAndExportTest ... 
+Assertion failed at RLEUnitTests//RLEListUnitTest.c:788 expectedString == resultString 
+expectedString:
+a65
+
+resultString:
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a2
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+a1
+[Failed]

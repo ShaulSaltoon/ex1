@@ -610,6 +610,7 @@ bool RLEListExportToStringTest()
     
     ASSERT_TEST(exportResult == RLE_LIST_SUCCESS, destroy);
     comparer = actuallResult;
+ 
     while (*expectedResult)
     {
         ASSERT_TEST(*comparer != '\0', destroy);
@@ -681,8 +682,8 @@ bool RLEListMapTest()
 
     char* text;
     char mappedText[124] = {0};
-    
-    text = "ABBabb------------\n\na";
+    //\n\n
+    text = "ABBabb------------a";
     for (int i = 0; i < FUNC_COUNT; i++)
     {
         RLEListDestroy(list);
@@ -696,7 +697,7 @@ bool RLEListMapTest()
 
         ASSERT_TEST_FULL_LIST(list, mappedText, destroy);
     }
-
+    //\n\n
     text = "ABBabb------------\n\na";
     for (int i = 0; i < FUNC_COUNT; i++)
     {
